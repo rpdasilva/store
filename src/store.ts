@@ -13,6 +13,7 @@ export class Store<T> extends Observable<T> implements Observer<Action> {
   constructor(
     private _dispatcher: Observer<Action>,
     private _reducer: Observer<ActionReducer<any>>,
+    private _enhancer: Function,
     state$: Observable<any>
   ) {
     super();
@@ -23,16 +24,22 @@ export class Store<T> extends Observable<T> implements Observer<Action> {
   select: SelectSignature<T> = select.bind(this);
 
   lift<R>(operator: Operator<T, R>): Store<R> {
-    const store = new Store<R>(this._dispatcher, this._reducer, this);
+    const store = new Store<R>(this._dispatcher, this._reducer, this._enhancer, this);
     store.operator = operator;
     return store;
   }
 
-  replaceReducer(reducer: ActionReducer<any>) {
+  getState = () => {
+    let _state;
+    this.source.take(1).subscribe(state => _state = state);
+    return _state;
+  }
+
+  replaceReducer = (reducer: ActionReducer<any>) => {
     this._reducer.next(reducer);
   }
 
-  dispatch(action: Action) {
+  dispatch = (action: Action) => {
     this._dispatcher.next(action);
   }
 

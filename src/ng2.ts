@@ -11,6 +11,7 @@ export const INITIAL_STATE = new OpaqueToken('Token ngrx/store/initial-state');
 
 export const _INITIAL_REDUCER = new OpaqueToken('Token _ngrx/store/reducer');
 export const _INITIAL_STATE = new OpaqueToken('Token _ngrx/store/initial-state');
+export const _ENHANCER = new OpaqueToken('Token _ngrx/store/enhancer');
 
 export function _initialReducerFactory(reducer) {
   if (typeof reducer === 'function') {
@@ -26,8 +27,8 @@ export function _initialStateFactory(initialState, reducer) {
   return initialState;
 }
 
-export function _storeFactory(dispatcher, reducer, state$) {
-  return new Store(dispatcher, reducer, state$);
+export function _storeFactory(dispatcher, reducer, state$, enhancer) {
+  return new Store(dispatcher, reducer, state$, enhancer);
 }
 
 export function _stateFactory(initialState: any, dispatcher: Dispatcher, reducer: Reducer) {
@@ -41,26 +42,27 @@ export function _reducerFactory(dispatcher, reducer) {
 /**
  * @deprecated, use StoreModule.provideStore instead!
  */
-export function provideStore(_reducer: any, _initialState?: any): any[] {
+export function provideStore(_reducer: any, _initialState?: any, _enhancer?: Function): any[] {
   return [
     Dispatcher,
-    { provide: Store, useFactory: _storeFactory, deps: [Dispatcher, Reducer, State] },
+    { provide: Store, useFactory: _storeFactory, deps: [Dispatcher, Reducer, State, _ENHANCER] },
     { provide: Reducer, useFactory: _reducerFactory, deps: [Dispatcher, INITIAL_REDUCER] },
     { provide: State, useFactory: _stateFactory, deps: [INITIAL_STATE, Dispatcher, Reducer] },
     { provide: INITIAL_REDUCER, useFactory: _initialReducerFactory, deps: [_INITIAL_REDUCER] },
     { provide: INITIAL_STATE, useFactory: _initialStateFactory, deps: [_INITIAL_STATE, INITIAL_REDUCER] },
     { provide: _INITIAL_STATE, useValue: _initialState },
-    { provide: _INITIAL_REDUCER, useValue: _reducer }
+    { provide: _INITIAL_REDUCER, useValue: _reducer },
+    { provide: _ENHANCER, useValue: _enhancer }
   ];
 }
 
 
 @NgModule({})
 export class StoreModule {
-  static provideStore(_reducer: any, _initialState?: any): ModuleWithProviders {
+  static provideStore(_reducer: any, _initialState?: any, _enhancer?: Function): ModuleWithProviders {
     return {
       ngModule: StoreModule,
-      providers: provideStore(_reducer, _initialState)
+      providers: provideStore(_reducer, _initialState, _enhancer)
     };
   }
 }
