@@ -27,8 +27,8 @@ export function _initialStateFactory(initialState, reducer) {
   return initialState;
 }
 
-export function _storeFactory(dispatcher, reducer, state$, enhancer) {
-  return new Store(dispatcher, reducer, state$, enhancer);
+export function _storeFactory(dispatcher, reducer, enhancer, state$) {
+  return new Store(dispatcher, reducer, enhancer, state$);
 }
 
 export function _stateFactory(initialState: any, dispatcher: Dispatcher, reducer: Reducer) {
@@ -45,7 +45,7 @@ export function _reducerFactory(dispatcher, reducer) {
 export function provideStore(_reducer: any, _initialState?: any, _enhancer?: Function): any[] {
   return [
     Dispatcher,
-    { provide: Store, useFactory: _storeFactory, deps: [Dispatcher, Reducer, State, _ENHANCER] },
+    { provide: Store, useFactory: _storeFactory, deps: [Dispatcher, Reducer, _ENHANCER, State] },
     { provide: Reducer, useFactory: _reducerFactory, deps: [Dispatcher, INITIAL_REDUCER] },
     { provide: State, useFactory: _stateFactory, deps: [INITIAL_STATE, Dispatcher, Reducer] },
     { provide: INITIAL_REDUCER, useFactory: _initialReducerFactory, deps: [_INITIAL_REDUCER] },

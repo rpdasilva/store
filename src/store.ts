@@ -3,6 +3,7 @@ import { Observer } from 'rxjs/Observer';
 import { Observable } from 'rxjs/Observable';
 import { Subscriber } from 'rxjs/Subscriber';
 import { Operator } from 'rxjs/Operator';
+import 'rxjs/add/operator/take';
 
 import { Action } from './dispatcher';
 import { State } from './state';
@@ -29,17 +30,17 @@ export class Store<T> extends Observable<T> implements Observer<Action> {
     return store;
   }
 
-  getState = () => {
+  getState() {
     let _state;
     this.source.take(1).subscribe(state => _state = state);
     return _state;
   }
 
-  replaceReducer = (reducer: ActionReducer<any>) => {
+  replaceReducer(reducer: ActionReducer<any>) {
     this._reducer.next(reducer);
   }
 
-  dispatch = (action: Action) => {
+  dispatch(action: Action) {
     this._dispatcher.next(action);
   }
 

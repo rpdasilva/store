@@ -28,3 +28,24 @@ export function combineReducers(reducers: any): ActionReducer<any> {
     return hasChanged ? nextState : state;
   };
 }
+
+export function createStore(reducer: any, preloadedState: any, enhancer: Function) {
+  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+    enhancer = preloadedState
+    preloadedState = undefined
+  }
+
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.')
+    }
+
+    return enhancer(createStore)(reducer, preloadedState)
+  }
+
+  if (typeof reducer !== 'function') {
+    throw new Error('Expected the reducer to be a function.')
+  }
+
+  return
+}
